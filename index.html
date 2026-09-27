@@ -3,38 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>究極再現・可変倍速リアルクロック</title>
+  <title>究極再現・世界の超名機クロックコレクション</title>
   
-  <!-- iOS向けPWA全画面設定 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="リアルクロック">
+  <meta name="apple-mobile-web-app-title" content="名機クロック">
 
-  <!-- インラインWeb App Manifest（Data URI形式） -->
-  <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIueptumjqOWGjeePv+ODquOCouODq+OCr+ODreODg+OCryIsCiAgInNob3J0X25hbWUiOiAi44Kv44Ot44OD44KvIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwODA5MGIiLAogICJ0aGVtZV9jb2xvciIjogIiMwODA5MGIiCn0=">
+  <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIuaMoeS7o+OCk+ODq+OCr+ODg+OCryIsCiAgInNob3J0X25hbWUiOiAi44Kv44Ot44OD44KvIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwNTA2MDgiLAogICJ0aGVtZV9jb2xvciIjogIiMwNTA2MDgiCn0=">
 
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       margin: 0;
-      padding: 10px;
+      padding: 12px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 95vh;
-      background-color: #08090b;
+      min-height: 98vh;
+      background-color: #050608;
       color: #e2e8f0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     }
     .container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      background: radial-gradient(circle at center, #1b1d24 0%, #0d0e12 100%);
-      padding: 16px;
-      border-radius: 24px;
-      box-shadow: 0 16px 36px rgba(0,0,0,0.9), inset 0 1px 1px rgba(255,255,255,0.1);
+      background: radial-gradient(circle at center, #161820 0%, #08090d 100%);
+      padding: 18px 14px;
+      border-radius: 28px;
+      box-shadow: 0 20px 48px rgba(0,0,0,0.95), inset 0 1px 1px rgba(255,255,255,0.12);
       width: 100%;
       max-width: 480px;
     }
@@ -42,7 +40,7 @@
       width: 320px;
       height: 320px;
       border-radius: 50%;
-      filter: drop-shadow(0 12px 24px rgba(0,0,0,0.8));
+      filter: drop-shadow(0 14px 28px rgba(0,0,0,0.85));
       display: block;
     }
     .controls {
@@ -65,30 +63,30 @@
       padding: 8px 12px;
       border-radius: 8px;
       border: 1px solid #334155;
-      background: #111216;
+      background: #0f172a;
       color: #f8fafc;
       font-size: 13px;
       font-weight: 600;
       outline: none;
       max-width: 100%;
     }
-    input[type="range"] { width: 140px; cursor: pointer; }
+    input[type="range"] { width: 130px; cursor: pointer; }
     input[type="number"] {
       width: 65px;
       padding: 6px 8px;
       border-radius: 6px;
       border: 1px solid #334155;
-      background: #111216;
+      background: #0f172a;
       color: #fff;
       font-size: 14px;
       text-align: right;
     }
-    .time-input { width: 46px !important; text-align: center !important; }
+    .time-input { width: 44px !important; text-align: center !important; }
     .digital-readout {
       margin: 6px 0;
-      font-size: 24px;
-      font-family: monospace;
-      color: #94a3b8;
+      font-size: 26px;
+      font-family: "SF Mono", "Courier New", monospace;
+      color: #cbd5e1;
       letter-spacing: 2px;
     }
     .button-group {
@@ -116,16 +114,18 @@
 <div class="container">
   <svg class="clock-svg" viewBox="0 0 360 360" id="clockSVG">
     <defs>
+      <!-- デイトナ・サブダイヤル -->
       <g id="daytonaSubDial">
-        <circle cx="0" cy="0" r="32" fill="#0d0e12" stroke="#e2e8f0" stroke-width="2.5"/>
-        <circle cx="0" cy="0" r="26" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.8"/>
-        <line x1="0" y1="-30" x2="0" y2="-24" stroke="#e2e8f0" stroke-width="1.2"/>
-        <line x1="0" y1="30" x2="0" y2="24" stroke="#e2e8f0" stroke-width="1.2"/>
-        <line x1="-30" y1="0" x2="-24" y2="0" stroke="#e2e8f0" stroke-width="1.2"/>
-        <line x1="30" y1="0" x2="24" y2="0" stroke="#e2e8f0" stroke-width="1.2"/>
+        <circle cx="0" cy="0" r="32" fill="#0b0c10" stroke="#cbd5e1" stroke-width="2.5"/>
+        <circle cx="0" cy="0" r="26" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="0.8"/>
+        <line x1="0" y1="-30" x2="0" y2="-24" stroke="#cbd5e1" stroke-width="1.2"/>
+        <line x1="0" y1="30" x2="0" y2="24" stroke="#cbd5e1" stroke-width="1.2"/>
+        <line x1="-30" y1="0" x2="-24" y2="0" stroke="#cbd5e1" stroke-width="1.2"/>
+        <line x1="30" y1="0" x2="24" y2="0" stroke="#cbd5e1" stroke-width="1.2"/>
         <line x1="0" y1="2" x2="0" y2="-20" stroke="#ffffff" stroke-width="1.5"/>
       </g>
 
+      <!-- ROLEX 王冠マーク -->
       <g id="rolexCoronet">
         <path d="M-10,0 L-13,-18 L-5,-9 L0,-22 L5,-9 L13,-18 L10,0 Z" fill="#eab308" stroke="#ca8a04" stroke-width="0.8"/>
         <circle cx="-13" cy="-19" r="1.8" fill="#eab308"/>
@@ -135,63 +135,46 @@
         <circle cx="13" cy="-19" r="1.8" fill="#eab308"/>
         <ellipse cx="0" cy="1" rx="9" ry="2.5" fill="#eab308" stroke="#ca8a04" stroke-width="0.8"/>
       </g>
+
+      <!-- AP タペストリー格子パターン -->
+      <pattern id="apPattern" width="14" height="14" patternUnits="userSpaceOnUse">
+        <rect width="13" height="13" fill="#1e293b" stroke="#0f172a" stroke-width="1"/>
+        <rect x="2" y="2" width="9" height="9" fill="#334155"/>
+      </pattern>
+
+      <!-- パテック 横ボーダーパターン -->
+      <pattern id="nautilusPattern" width="360" height="10" patternUnits="userSpaceOnUse">
+        <line x1="0" y1="0" x2="360" y2="0" stroke="#0f172a" stroke-width="3"/>
+        <line x1="0" y1="5" x2="360" y2="5" stroke="#1e3a5f" stroke-width="7"/>
+      </pattern>
     </defs>
 
-    <g id="dialGroup">
-      <circle cx="180" cy="180" r="176" fill="#0a0a0c" stroke="#334155" stroke-width="3"/>
-      <circle cx="180" cy="180" r="148" fill="#0d0e12" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
-      
-      <text x="180" y="24" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#e2e8f0" letter-spacing="1">UNITS PER HOUR 400</text>
-      <text x="342" y="183" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#e2e8f0">120</text>
-      <text x="180" y="348" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#e2e8f0">80</text>
-      <text x="18" y="183" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#e2e8f0">60</text>
+    <!-- レイヤー1: 文字盤 -->
+    <g id="dialGroup"></g>
 
-      <use href="#daytonaSubDial" x="240" y="180"/>
-      <use href="#daytonaSubDial" x="120" y="180"/>
-      <use href="#daytonaSubDial" x="180" y="236"/>
-
-      <use href="#rolexCoronet" x="180" y="86"/>
-      <text x="180" y="104" text-anchor="middle" font-family="'Times New Roman', serif" font-size="16" font-weight="bold" fill="#ffffff">ROLEX</text>
-      <text x="180" y="115" text-anchor="middle" font-size="6.5" font-weight="bold" fill="#cbd5e1" letter-spacing="1">OYSTER PERPETUAL</text>
-      <text x="180" y="124" text-anchor="middle" font-size="5.5" font-weight="bold" fill="#94a3b8">SUPERLATIVE CHRONOMETER</text>
-      <text x="180" y="196" text-anchor="middle" font-size="8" font-weight="bold" fill="#ef4444" letter-spacing="0.5">DAYTONA</text>
-
-      <rect x="226" y="58" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(30 228 65)"/>
-      <rect x="268" y="100" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(60 270 107)"/>
-      <rect x="268" y="246" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(120 270 253)"/>
-      <rect x="226" y="288" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(150 228 295)"/>
-      <rect x="129" y="288" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(210 131 295)"/>
-      <rect x="87" y="246" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(240 89 253)"/>
-      <rect x="87" y="100" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(300 89 107)"/>
-      <rect x="129" y="58" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(330 131 65)"/>
-    </g>
-
-    <g id="hourGroup" transform="rotate(305 180 180)">
-      <rect x="176.5" y="100" width="7" height="84" rx="2" fill="#e2e8f0"/>
-      <rect x="178.5" y="106" width="3" height="60" rx="1" fill="#93c5fd"/>
-    </g>
-    <g id="minGroup" transform="rotate(60 180 180)">
-      <rect x="177.5" y="60" width="5" height="124" rx="1.5" fill="#e2e8f0"/>
-      <rect x="179" y="66" width="2" height="96" rx="1" fill="#93c5fd"/>
-    </g>
-    <g id="secGroup" transform="rotate(180 180 180)">
-      <line x1="180" y1="210" x2="180" y2="40" stroke="#ef4444" stroke-width="1.8" stroke-linecap="round"/>
-      <circle cx="180" cy="75" r="3.5" fill="#ef4444"/>
-    </g>
-    <circle cx="180" cy="180" r="5" fill="#e2e8f0" stroke="#334155" stroke-width="1.5"/>
+    <!-- レイヤー2: 針（時・分・秒・センターピン） -->
+    <g id="hourGroup"></g>
+    <g id="minGroup"></g>
+    <g id="secGroup"></g>
+    <g id="capGroup"></g>
   </svg>
   
-  <div class="digital-readout" id="digitalTime">10:10:30</div>
+  <div class="digital-readout" id="digitalTime">00:00:00</div>
 
   <div class="controls">
     <div class="control-row">
-      <label for="themeSelector">超精巧デザイン:</label>
+      <label for="themeSelector">名機デザイン:</label>
       <select id="themeSelector" onchange="changeTheme(this.value)">
-        <option value="rolex" selected>1. ROLEX デイトナ（黒セラクロム＆3連メーター）</option>
-        <option value="franck">2. FRANCK MULLER カサブランカ（極大ビザン数字＆トノー）</option>
-        <option value="omega">3. OMEGA スピードマスター（Ω＆プロフェッショナル）</option>
-        <option value="gshock">4. G-SHOCK（八角オクタゴン＆四隅ビス）</option>
-        <option value="plain">5. スタンダード（初期・無地シンプル白）</option>
+        <option value="franck" selected>1. フランク ミュラー（トノウ カーベックス・カサブランカ）</option>
+        <option value="rolex">2. ロレックス（コスモグラフ デイトナ）</option>
+        <option value="ap">3. オーデマ ピゲ（ロイヤル オーク・タペストリー）</option>
+        <option value="patek">4. パテック フィリップ（ノーチラス ブルー）</option>
+        <option value="panerai">5. パネライ（ルミノール・サンドイッチ文字盤）</option>
+        <option value="omega">6. オメガ（スピードマスター ムーンウォッチ）</option>
+        <option value="cartier">7. カルティエ（サントス・ローマン＆青焼き針）</option>
+        <option value="iwc">8. IWC（ポルトギーゼ・クロノグラフ リーフ針）</option>
+        <option value="breitling">9. ブライトリング（ナビタイマー 航空計算尺）</option>
+        <option value="gs">10. グランドセイコー（白樺 / 雪白 ドーフィン針）</option>
       </select>
     </div>
 
@@ -229,6 +212,7 @@
   var hourGroup = document.getElementById("hourGroup");
   var minGroup = document.getElementById("minGroup");
   var secGroup = document.getElementById("secGroup");
+  var capGroup = document.getElementById("capGroup");
   var digitalTimeEl = document.getElementById("digitalTime");
 
   var speedRange = document.getElementById("speedRange");
@@ -287,9 +271,52 @@
     }
   };
 
+  // 10大ブランドごとの文字盤・針セットアップ
   window.changeTheme = function(key) {
-    if (key === "rolex") {
-      dialGroup.innerHTML = `
+    var dialHTML = "";
+    var hourHTML = "";
+    var minHTML = "";
+    var secHTML = "";
+    var capHTML = "";
+
+    if (key === "franck") {
+      // 1. フランク ミュラー（カサブランカ・トノウ カーベックス）
+      dialHTML = `
+        <!-- トノウ型外殻＆ブラックダイアル -->
+        <rect x="10" y="10" width="340" height="340" rx="60" fill="#0b0b0e" stroke="#475569" stroke-width="4"/>
+        <path d="M 180,26 C 290,26 324,80 324,180 C 324,280 290,334 180,334 C 70,334 36,280 36,180 C 36,80 70,26 180,26 Z" fill="#121318" stroke="#334155" stroke-width="2.5"/>
+        <!-- 象徴的な歪曲ビザン数字（角度・変形比率個別チューニング） -->
+        <g fill="#e2d9cc" font-family="'Times New Roman', Georgia, serif" font-weight="900" text-anchor="middle">
+          <text x="180" y="74" font-size="46" transform="scale(1.0, 1.45) translate(0, -18)">12</text>
+          <text x="246" y="90" font-size="44" transform="rotate(22 246 90) scale(0.9, 1.4)">1</text>
+          <text x="290" y="136" font-size="44" transform="rotate(45 290 136) scale(0.95, 1.35)">2</text>
+          <text x="302" y="196" font-size="52" transform="scale(1.4, 1.0) translate(-65, 0)">3</text>
+          <text x="288" y="250" font-size="44" transform="rotate(-40 288 250) scale(0.95, 1.35)">4</text>
+          <text x="242" y="296" font-size="44" transform="rotate(-20 242 296) scale(0.9, 1.4)">5</text>
+          <text x="180" y="240" font-size="52" transform="scale(1.0, 1.45) translate(0, -12)">6</text>
+          <text x="118" y="296" font-size="44" transform="rotate(20 118 296) scale(0.9, 1.4)">7</text>
+          <text x="72" y="250" font-size="44" transform="rotate(40 72 250) scale(0.95, 1.35)">8</text>
+          <text x="58" y="196" font-size="52" transform="scale(1.4, 1.0) translate(14, 0)">9</text>
+          <text x="70" y="136" font-size="44" transform="rotate(-45 70 136) scale(0.95, 1.35)">10</text>
+          <text x="114" y="90" font-size="44" transform="rotate(-22 114 90) scale(0.9, 1.4)">11</text>
+        </g>
+        <!-- ロゴ＆アーチ文字 -->
+        <path id="fmCurve" d="M 125,124 Q 180,106 235,124" fill="none"/>
+        <text font-family="'Times New Roman', serif" font-size="12" font-weight="bold" fill="#f1f5f9" letter-spacing="1.5">
+          <textPath href="#fmCurve" startOffset="50%" text-anchor="middle">FRANCK MULLER</textPath>
+        </text>
+        <text x="180" y="136" text-anchor="middle" font-family="'Times New Roman', serif" font-size="7.5" font-weight="bold" fill="#94a3b8" letter-spacing="1">GENEVE</text>
+        <text x="180" y="234" text-anchor="middle" font-family="Georgia, serif" font-size="11" font-weight="bold" fill="#e2d9cc" letter-spacing="1.5">CASABLANCA</text>
+      `;
+      // ブルースチール・スペード／リーフ針
+      hourHTML = `<path d="M 180,180 L 174,150 Q 172,120 180,95 Q 188,120 186,150 Z" fill="#2563eb" stroke="#1d4ed8" stroke-width="1"/>`;
+      minHTML  = `<path d="M 180,180 L 175,140 Q 173,85 180,52 Q 187,85 185,140 Z" fill="#2563eb" stroke="#1d4ed8" stroke-width="1"/>`;
+      secHTML  = `<line x1="180" y1="210" x2="180" y2="40" stroke="#38bdf8" stroke-width="1.4"/><circle cx="180" cy="70" r="3" fill="#38bdf8"/>`;
+      capHTML  = `<circle cx="180" cy="180" r="4.5" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>`;
+
+    } else if (key === "rolex") {
+      // 2. ロレックス（デイトナ）
+      dialHTML = `
         <circle cx="180" cy="180" r="176" fill="#0a0a0c" stroke="#334155" stroke-width="3"/>
         <circle cx="180" cy="180" r="148" fill="#0d0e12" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
         <text x="180" y="24" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#e2e8f0" letter-spacing="1">UNITS PER HOUR 400</text>
@@ -313,29 +340,83 @@
         <rect x="87" y="100" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(300 89 107)"/>
         <rect x="129" y="58" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(330 131 65)"/>
       `;
-    } else if (key === "franck") {
-      dialGroup.innerHTML = `
-        <circle cx="180" cy="180" r="176" fill="#e2e8f0" stroke="#94a3b8" stroke-width="4"/>
-        <circle cx="180" cy="180" r="160" fill="#f6f3eb"/>
-        <ellipse cx="180" cy="180" rx="90" ry="115" fill="none" stroke="#475569" stroke-width="1.8"/>
-        <text x="180" y="125" text-anchor="middle" font-family="Georgia, serif" font-size="14" font-weight="bold" fill="#1e2229">FRANCK MULLER</text>
-        <text x="180" y="139" text-anchor="middle" font-family="Georgia, serif" font-size="9" font-style="italic" fill="#64748b">GENEVE</text>
-        <text x="180" y="235" text-anchor="middle" font-family="Georgia, serif" font-size="11" font-weight="bold" fill="#b91c1c">Casablanca</text>
-        <text x="180" y="60" text-anchor="middle" font-family="'Times New Roman', serif" font-size="44" font-weight="bold" fill="#1e2229" transform="scale(1, 1.4) translate(0, -16)">12</text>
-        <text x="250" y="80" text-anchor="middle" font-family="'Times New Roman', serif" font-size="38" font-weight="bold" fill="#1e2229">1</text>
-        <text x="290" y="130" text-anchor="middle" font-family="'Times New Roman', serif" font-size="40" font-weight="bold" fill="#1e2229">2</text>
-        <text x="305" y="195" text-anchor="middle" font-family="'Times New Roman', serif" font-size="46" font-weight="bold" fill="#1e2229" transform="scale(1.3, 1) translate(-70, 0)">3</text>
-        <text x="290" y="255" text-anchor="middle" font-family="'Times New Roman', serif" font-size="40" font-weight="bold" fill="#1e2229">4</text>
-        <text x="250" y="305" text-anchor="middle" font-family="'Times New Roman', serif" font-size="38" font-weight="bold" fill="#1e2229">5</text>
-        <text x="180" y="245" text-anchor="middle" font-family="'Times New Roman', serif" font-size="44" font-weight="bold" fill="#1e2229" transform="scale(1, 1.4) translate(0, -10)">6</text>
-        <text x="110" y="305" text-anchor="middle" font-family="'Times New Roman', serif" font-size="38" font-weight="bold" fill="#1e2229">7</text>
-        <text x="70" y="255" text-anchor="middle" font-family="'Times New Roman', serif" font-size="40" font-weight="bold" fill="#1e2229">8</text>
-        <text x="55" y="195" text-anchor="middle" font-family="'Times New Roman', serif" font-size="46" font-weight="bold" fill="#1e2229" transform="scale(1.3, 1) translate(14, 0)">9</text>
-        <text x="70" y="130" text-anchor="middle" font-family="'Times New Roman', serif" font-size="40" font-weight="bold" fill="#1e2229">10</text>
-        <text x="110" y="80" text-anchor="middle" font-family="'Times New Roman', serif" font-size="38" font-weight="bold" fill="#1e2229">11</text>
+      hourHTML = `<rect x="176.5" y="100" width="7" height="84" rx="2" fill="#e2e8f0"/><rect x="178.5" y="106" width="3" height="60" rx="1" fill="#93c5fd"/>`;
+      minHTML  = `<rect x="177.5" y="60" width="5" height="124" rx="1.5" fill="#e2e8f0"/><rect x="179" y="66" width="2" height="96" rx="1" fill="#93c5fd"/>`;
+      secHTML  = `<line x1="180" y1="210" x2="180" y2="40" stroke="#ef4444" stroke-width="1.8" stroke-linecap="round"/><circle cx="180" cy="75" r="3.5" fill="#ef4444"/>`;
+      capHTML  = `<circle cx="180" cy="180" r="5" fill="#e2e8f0" stroke="#334155" stroke-width="1.5"/>`;
+
+    } else if (key === "ap") {
+      // 3. オーデマ ピゲ（ロイヤル オーク）
+      dialHTML = `
+        <polygon points="180,6 295,54 345,180 295,306 180,354 65,306 15,180 65,54" fill="#1e222d" stroke="#64748b" stroke-width="6"/>
+        <!-- 8角形固定ビス -->
+        <circle cx="65" cy="54" r="5" fill="#94a3b8"/><circle cx="295" cy="54" r="5" fill="#94a3b8"/>
+        <circle cx="345" cy="180" r="5" fill="#94a3b8"/><circle cx="295" cy="306" r="5" fill="#94a3b8"/>
+        <circle cx="180" cy="354" r="5" fill="#94a3b8"/><circle cx="65" cy="306" r="5" fill="#94a3b8"/>
+        <circle cx="15" cy="180" r="5" fill="#94a3b8"/><circle cx="180" cy="6" r="5" fill="#94a3b8"/>
+        <circle cx="180" cy="180" r="142" fill="url(#apPattern)" stroke="#334155" stroke-width="1"/>
+        <text x="180" y="112" text-anchor="middle" font-family="'Arial Black', sans-serif" font-size="13" font-weight="bold" fill="#ffffff" letter-spacing="1">AUDEMARS PIGUET</text>
+        <text x="180" y="125" text-anchor="middle" font-size="7" font-weight="bold" fill="#94a3b8" letter-spacing="1.5">AUTOMATIC</text>
+        <!-- 12時ダブルバトン＆各インデックス -->
+        <rect x="175" y="44" width="4" height="20" fill="#e2e8f0"/><rect x="181" y="44" width="4" height="20" fill="#e2e8f0"/>
+        <rect x="296" y="177.5" width="20" height="5" fill="#e2e8f0"/>
+        <rect x="177.5" y="296" width="5" height="20" fill="#e2e8f0"/>
+        <rect x="44" y="177.5" width="20" height="5" fill="#e2e8f0"/>
       `;
+      hourHTML = `<rect x="176" y="95" width="8" height="90" rx="4" fill="#ffffff" stroke="#475569" stroke-width="1.5"/><rect x="178.5" y="102" width="3" height="65" rx="1.5" fill="#94a3b8"/>`;
+      minHTML  = `<rect x="177" y="55" width="6" height="130" rx="3" fill="#ffffff" stroke="#475569" stroke-width="1.5"/><rect x="179" y="62" width="2" height="100" rx="1" fill="#94a3b8"/>`;
+      secHTML  = `<line x1="180" y1="210" x2="180" y2="40" stroke="#cbd5e1" stroke-width="1.2"/>`;
+      capHTML  = `<circle cx="180" cy="180" r="4.5" fill="#cbd5e1"/>`;
+
+    } else if (key === "patek") {
+      // 4. パテック フィリップ（ノーチラス）
+      dialHTML = `
+        <rect x="15" y="15" width="330" height="330" rx="80" fill="#0d1f33" stroke="#475569" stroke-width="8"/>
+        <rect x="25" y="25" width="310" height="310" rx="70" fill="url(#nautilusPattern)" stroke="#1e3a5f" stroke-width="2"/>
+        <text x="180" y="115" text-anchor="middle" font-family="'Times New Roman', serif" font-size="14" font-weight="bold" fill="#ffffff" letter-spacing="1">PATEK PHILIPPE</text>
+        <text x="180" y="128" text-anchor="middle" font-size="7" font-weight="bold" fill="#94a3b8" letter-spacing="1">GENEVE</text>
+        <rect x="175" y="52" width="4" height="22" rx="2" fill="#e2e8f0"/><rect x="181" y="52" width="4" height="22" rx="2" fill="#e2e8f0"/>
+        <rect x="286" y="177" width="22" height="6" rx="2" fill="#e2e8f0"/>
+        <rect x="177" y="286" width="6" height="22" rx="2" fill="#e2e8f0"/>
+        <rect x="52" y="177" width="22" height="6" rx="2" fill="#e2e8f0"/>
+      `;
+      hourHTML = `<rect x="176" y="98" width="8" height="88" rx="4" fill="#ffffff" stroke="#334155" stroke-width="1.5"/><rect x="178.5" y="104" width="3" height="65" rx="1.5" fill="#67e8f9"/>`;
+      minHTML  = `<rect x="177" y="58" width="6" height="128" rx="3" fill="#ffffff" stroke="#334155" stroke-width="1.5"/><rect x="179" y="64" width="2" height="100" rx="1" fill="#67e8f9"/>`;
+      secHTML  = `<line x1="180" y1="210" x2="180" y2="38" stroke="#ffffff" stroke-width="1.2"/>`;
+      capHTML  = `<circle cx="180" cy="180" r="4" fill="#ffffff"/>`;
+
+    } else if (key === "panerai") {
+      // 5. パネライ（ルミノール）
+      dialHTML = `
+        <rect x="10" y="10" width="340" height="340" rx="55" fill="#141518" stroke="#334155" stroke-width="4"/>
+        <circle cx="180" cy="180" r="150" fill="#0d0e10"/>
+        <!-- サンドイッチ夜光数字（くり抜き表現） -->
+        <g fill="#4ade80" font-family="'Arial Black', sans-serif" font-weight="900" font-size="44" text-anchor="middle">
+          <text x="180" y="72">12</text>
+          <text x="304" y="196">3</text>
+          <text x="180" y="320">6</text>
+          <text x="56" y="196">9</text>
+        </g>
+        <!-- くり抜きバー -->
+        <rect x="238" y="80" width="6" height="22" rx="3" fill="#4ade80" transform="rotate(30 241 91)"/>
+        <rect x="278" y="122" width="6" height="22" rx="3" fill="#4ade80" transform="rotate(60 281 133)"/>
+        <rect x="278" y="216" width="6" height="22" rx="3" fill="#4ade80" transform="rotate(120 281 227)"/>
+        <rect x="238" y="258" width="6" height="22" rx="3" fill="#4ade80" transform="rotate(150 241 269)"/>
+        <rect x="116" y="258" width="6" height="22" rx="3" fill="#4ade80" transform="rotate(210 119 269)"/>
+        <rect x="76" y="216" width="6" height="22" rx="3" fill="#4ade80" transform="rotate(240 79 227)"/>
+        <rect x="76" y="122" width="6" height="22" rx="3" fill="#4ade80" transform="rotate(300 79 133)"/>
+        <rect x="116" y="80" width="6" height="22" rx="3" fill="#4ade80" transform="rotate(330 119 91)"/>
+        <text x="180" y="120" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="900" fill="#e2e8f0" letter-spacing="2">LUMINOR</text>
+        <text x="180" y="134" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="#94a3b8" letter-spacing="1">PANERAI</text>
+      `;
+      hourHTML = `<rect x="175" y="90" width="10" height="95" rx="5" fill="#0d0e10" stroke="#4ade80" stroke-width="2.5"/><circle cx="180" cy="115" r="2.5" fill="#4ade80"/>`;
+      minHTML  = `<rect x="176" y="52" width="8" height="135" rx="4" fill="#0d0e10" stroke="#4ade80" stroke-width="2.5"/><circle cx="180" cy="75" r="2" fill="#4ade80"/>`;
+      secHTML  = `<circle cx="120" cy="180" r="20" fill="none" stroke="#334155" stroke-width="1"/><line x1="120" y1="180" x2="120" y2="164" stroke="#4ade80" stroke-width="1.8"/>`;
+      capHTML  = `<circle cx="180" cy="180" r="6" fill="#1e293b" stroke="#4ade80" stroke-width="1.5"/>`;
+
     } else if (key === "omega") {
-      dialGroup.innerHTML = `
+      // 6. オメガ（スピードマスター）
+      dialHTML = `
         <circle cx="180" cy="180" r="176" fill="#121318" stroke="#383a42" stroke-width="3"/>
         <circle cx="180" cy="180" r="150" fill="#0a0a0c"/>
         <text x="180" y="22" text-anchor="middle" font-size="9" font-weight="bold" fill="#e2e8f0" letter-spacing="1">TACHYMETRE 500</text>
@@ -347,37 +428,126 @@
         <text x="180" y="124" text-anchor="middle" font-family="cursive, serif" font-size="10" font-style="italic" fill="#ffffff">Speedmaster</text>
         <text x="180" y="134" text-anchor="middle" font-family="serif" font-size="7" font-style="italic" fill="#94a3b8">PROFESSIONAL</text>
       `;
-    } else if (key === "gshock") {
-      dialGroup.innerHTML = `
-        <polygon points="128,4 232,4 356,128 356,232 232,356 128,356 4,232 4,128" fill="#16171b" stroke="#272932" stroke-width="4"/>
-        <circle cx="50" cy="50" r="4.5" fill="#475569" stroke="#1e293b"/>
-        <circle cx="310" cy="50" r="4.5" fill="#475569" stroke="#1e293b"/>
-        <circle cx="50" cy="310" r="4.5" fill="#475569" stroke="#1e293b"/>
-        <circle cx="310" cy="310" r="4.5" fill="#475569" stroke="#1e293b"/>
-        <text x="180" y="28" text-anchor="middle" font-family="'Arial Black', sans-serif" font-size="17" font-weight="900" fill="#cbd5e1">G-SHOCK</text>
-        <text x="180" y="344" text-anchor="middle" font-family="'Arial Black', sans-serif" font-size="15" font-weight="900" fill="#cbd5e1">PROTECTION</text>
-        <circle cx="180" cy="180" r="126" fill="#0f1013" stroke="#2e323b" stroke-width="2"/>
-        <circle cx="120" cy="180" r="28" fill="#1a1c23" stroke="#334155" stroke-width="1"/>
-        <text x="180" y="132" text-anchor="middle" font-family="'Arial Black', sans-serif" font-size="13" font-weight="bold" fill="#ffffff">CASIO</text>
-        <text x="180" y="146" text-anchor="middle" font-size="8" font-weight="bold" fill="#94a3b8">WR 20BAR</text>
+      hourHTML = `<path d="M 176,110 L 180,92 L 184,110 L 182,180 L 178,180 Z" fill="#ffffff"/>`;
+      minHTML  = `<path d="M 177,65 L 180,50 L 183,65 L 182,180 L 178,180 Z" fill="#ffffff"/>`;
+      secHTML  = `<line x1="180" y1="210" x2="180" y2="40" stroke="#ffffff" stroke-width="1.2"/><polygon points="180,68 177,74 183,74" fill="#ffffff"/>`;
+      capHTML  = `<circle cx="180" cy="180" r="4" fill="#ffffff"/>`;
+
+    } else if (key === "cartier") {
+      // 7. カルティエ（サントス）
+      dialHTML = `
+        <rect x="15" y="15" width="330" height="330" rx="35" fill="#f8fafc" stroke="#94a3b8" stroke-width="8"/>
+        <!-- ベゼルビス -->
+        <circle cx="35" cy="35" r="4" fill="#cbd5e1"/><circle cx="325" cy="35" r="4" fill="#cbd5e1"/>
+        <circle cx="325" cy="325" r="4" fill="#cbd5e1"/><circle cx="35" cy="325" r="4" fill="#cbd5e1"/>
+        <!-- レイルウェイ分目盛り -->
+        <rect x="65" y="65" width="230" height="230" rx="10" fill="none" stroke="#1e293b" stroke-width="2"/>
+        <rect x="75" y="75" width="210" height="210" rx="8" fill="none" stroke="#1e293b" stroke-width="1"/>
+        <!-- 伝統のローマン数字 -->
+        <g fill="#0f172a" font-family="'Times New Roman', serif" font-weight="900" font-size="28" text-anchor="middle">
+          <text x="180" y="54">XII</text>
+          <text x="242" y="70">I</text>
+          <text x="290" y="118">II</text>
+          <text x="312" y="188">III</text>
+          <text x="294" y="258">IV</text>
+          <text x="242" y="306">V</text>
+          <text x="180" y="324">VI</text>
+          <text x="118" y="306">VII</text>
+          <text x="66" y="258">VIII</text>
+          <text x="48" y="188">IX</text>
+          <text x="70" y="118">X</text>
+          <text x="118" y="70">XI</text>
+        </g>
+        <text x="180" y="130" text-anchor="middle" font-family="'Times New Roman', serif" font-size="16" font-weight="bold" fill="#0f172a" letter-spacing="2">Cartier</text>
+        <text x="180" y="235" text-anchor="middle" font-family="sans-serif" font-size="7" font-weight="bold" fill="#64748b" letter-spacing="1.5">AUTOMATIC</text>
       `;
+      // 青焼きブレゲ／剣型針
+      hourHTML = `<polygon points="180,95 183.5,140 180,180 176.5,140" fill="#1d4ed8"/>`;
+      minHTML  = `<polygon points="180,55 183,140 180,180 177,140" fill="#1d4ed8"/>`;
+      secHTML  = `<line x1="180" y1="205" x2="180" y2="48" stroke="#1e3a8a" stroke-width="1.2"/>`;
+      capHTML  = `<circle cx="180" cy="180" r="4" fill="#1d4ed8"/>`;
+
+    } else if (key === "iwc") {
+      // 8. IWC（ポルトギーゼ）
+      dialHTML = `
+        <circle cx="180" cy="180" r="175" fill="#f8fafc" stroke="#cbd5e1" stroke-width="3"/>
+        <!-- 縦2連クロノグラフメーター -->
+        <circle cx="180" cy="120" r="30" fill="none" stroke="#cbd5e1" stroke-width="1.2"/>
+        <circle cx="180" cy="240" r="30" fill="none" stroke="#cbd5e1" stroke-width="1.2"/>
+        <!-- 立体エンボス調アラビア数字 -->
+        <g fill="#1e3a8a" font-family="Georgia, serif" font-weight="bold" font-size="22" text-anchor="middle">
+          <text x="180" y="48">12</text>
+          <text x="246" y="66">1</text>
+          <text x="294" y="114">2</text>
+          <text x="312" y="188">3</text>
+          <text x="294" y="262">4</text>
+          <text x="246" y="310">5</text>
+          <text x="180" y="330">6</text>
+          <text x="114" y="310">7</text>
+          <text x="66" y="262">8</text>
+          <text x="48" y="188">9</text>
+          <text x="66" y="114">10</text>
+          <text x="114" y="66">11</text>
+        </g>
+        <text x="248" y="178" text-anchor="middle" font-family="'Times New Roman', serif" font-size="16" font-weight="900" fill="#0f172a">IWC</text>
+        <text x="248" y="188" text-anchor="middle" font-size="6" font-weight="bold" fill="#64748b">SCHAFFHAUSEN</text>
+      `;
+      // 極細エレガント・リーフ針
+      hourHTML = `<path d="M 180,180 Q 175,135 180,100 Q 185,135 180,180 Z" fill="#1e3a8a"/>`;
+      minHTML  = `<path d="M 180,180 Q 176,110 180,55 Q 184,110 180,180 Z" fill="#1e3a8a"/>`;
+      secHTML  = `<line x1="180" y1="210" x2="180" y2="40" stroke="#1d4ed8" stroke-width="1"/>`;
+      capHTML  = `<circle cx="180" cy="180" r="3.5" fill="#1e3a8a"/>`;
+
+    } else if (key === "breitling") {
+      // 9. ブライトリング（ナビタイマー）
+      dialHTML = `
+        <circle cx="180" cy="180" r="176" fill="#0b0c10" stroke="#94a3b8" stroke-width="4"/>
+        <!-- 航空計算尺目盛り帯 -->
+        <circle cx="180" cy="180" r="162" fill="none" stroke="#f8fafc" stroke-width="12" stroke-dasharray="2,3"/>
+        <circle cx="180" cy="180" r="148" fill="#111217" stroke="#ffffff" stroke-width="1.5"/>
+        <!-- 3連シルバーメーター -->
+        <circle cx="236" cy="180" r="26" fill="#1f2937" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="124" cy="180" r="26" fill="#1f2937" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="180" cy="236" r="26" fill="#1f2937" stroke="#e2e8f0" stroke-width="1.5"/>
+        <!-- ゴールドの翼ロゴ -->
+        <path d="M 165,108 Q 180,102 195,108 Q 180,116 165,108 Z" fill="#eab308"/>
+        <text x="180" y="112" text-anchor="middle" font-family="'Times New Roman', serif" font-size="14" font-weight="900" fill="#eab308">B</text>
+        <text x="180" y="124" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="900" fill="#ffffff" letter-spacing="1">BREITLING</text>
+        <text x="180" y="133" text-anchor="middle" font-size="6.5" font-weight="bold" fill="#ef4444">NAVITIMER</text>
+      `;
+      hourHTML = `<rect x="176" y="96" width="8" height="88" fill="#f8fafc"/><rect x="178" y="104" width="4" height="60" fill="#ef4444"/>`;
+      minHTML  = `<rect x="177" y="56" width="6" height="128" fill="#f8fafc"/><rect x="178.5" y="64" width="3" height="96" fill="#ef4444"/>`;
+      secHTML  = `<line x1="180" y1="210" x2="180" y2="40" stroke="#ef4444" stroke-width="1.4"/><polygon points="180,40 176,50 184,50" fill="#ef4444"/>`;
+      capHTML  = `<circle cx="180" cy="180" r="4.5" fill="#f8fafc"/>`;
+
     } else {
-      dialGroup.innerHTML = `
-        <circle cx="180" cy="180" r="174" fill="#ffffff" stroke="#222222" stroke-width="6"/>
-        <text x="180" y="48" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">12</text>
-        <text x="246" y="66" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">1</text>
-        <text x="294" y="114" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">2</text>
-        <text x="312" y="188" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">3</text>
-        <text x="294" y="262" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">4</text>
-        <text x="246" y="310" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">5</text>
-        <text x="180" y="328" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">6</text>
-        <text x="114" y="310" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">7</text>
-        <text x="66" y="262" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">8</text>
-        <text x="48" y="188" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">9</text>
-        <text x="66" y="114" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">10</text>
-        <text x="114" y="66" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">11</text>
+      // 10. グランドセイコー（白樺 / 雪白 SLGH）
+      dialHTML = `
+        <circle cx="180" cy="180" r="176" fill="#f1f5f9" stroke="#94a3b8" stroke-width="3"/>
+        <circle cx="180" cy="180" r="168" fill="#ffffff"/>
+        <!-- 多面カット・極厚ダイヤモンドインデックス -->
+        <rect x="176" y="24" width="8" height="24" fill="#334155" stroke="#94a3b8" stroke-width="0.8"/>
+        <rect x="288" y="176" width="24" height="8" fill="#334155" stroke="#94a3b8" stroke-width="0.8"/>
+        <rect x="176" y="312" width="8" height="24" fill="#334155" stroke="#94a3b8" stroke-width="0.8"/>
+        <rect x="48" y="176" width="24" height="8" fill="#334155" stroke="#94a3b8" stroke-width="0.8"/>
+        <g fill="#0f172a" font-family="'Times New Roman', serif" font-weight="bold" text-anchor="middle">
+          <text x="180" y="112" font-size="22">GS</text>
+          <text x="180" y="126" font-size="12" letter-spacing="1">Grand Seiko</text>
+          <text x="180" y="235" font-size="7.5" fill="#475569" letter-spacing="1.5">HI-BEAT 36000</text>
+        </g>
       `;
+      // 極太ドーフィン針＆ブルースチール秒針
+      hourHTML = `<polygon points="180,88 186,145 180,180 174,145" fill="#334155" stroke="#64748b" stroke-width="0.8"/>`;
+      minHTML  = `<polygon points="180,48 185,145 180,180 175,145" fill="#334155" stroke="#64748b" stroke-width="0.8"/>`;
+      secHTML  = `<line x1="180" y1="210" x2="180" y2="35" stroke="#1d4ed8" stroke-width="1.2"/>`;
+      capHTML  = `<circle cx="180" cy="180" r="4.5" fill="#334155"/>`;
     }
+
+    dialGroup.innerHTML = dialHTML;
+    hourGroup.innerHTML = hourHTML;
+    minGroup.innerHTML = minHTML;
+    secGroup.innerHTML = secHTML;
+    capGroup.innerHTML = capHTML;
   };
 
   function update() {
@@ -407,36 +577,28 @@
     requestAnimationFrame(update);
   }
 
+  // 初期文字盤生成＆アニメーション起動
+  changeTheme("franck");
   requestAnimationFrame(update);
 
-  // 【PWA オフライン化】インライン Service Worker の自動登録
+  // PWA用インライン Service Worker
   if ("serviceWorker" in navigator) {
     var swCode = `
-      var CACHE_NAME = 'real-clock-v1';
-      self.addEventListener('install', function(e) {
-        self.skipWaiting();
-      });
-      self.addEventListener('activate', function(e) {
-        e.waitUntil(clients.claim());
-      });
+      var CACHE_NAME = 'real-clock-v2';
+      self.addEventListener('install', function(e) { self.skipWaiting(); });
+      self.addEventListener('activate', function(e) { e.waitUntil(clients.claim()); });
       self.addEventListener('fetch', function(e) {
         e.respondWith(
           fetch(e.request).then(function(res) {
             var copy = res.clone();
-            caches.open(CACHE_NAME).then(function(cache) {
-              cache.put(e.request, copy);
-            });
+            caches.open(CACHE_NAME).then(function(cache) { cache.put(e.request, copy); });
             return res;
-          }).catch(function() {
-            return caches.match(e.request);
-          })
+          }).catch(function() { return caches.match(e.request); })
         );
       });
     `;
     var blob = new Blob([swCode], { type: "application/javascript" });
-    navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(function(err) {
-      console.warn("PWA SW:", err);
-    });
+    navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(function() {});
   }
 })();
 </script>
