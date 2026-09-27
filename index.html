@@ -114,16 +114,42 @@
 <div class="container">
   <svg class="clock-svg" viewBox="0 0 360 360" id="clockSVG">
     <defs>
-      <!-- デイトナ「パンダ（白文字盤）」専用サブダイヤル部品 -->
-      <!-- 3時位置: 30分積算計 -->
+      <!-- GS Ushio（潮・ダイナミックウェーブ）テクスチャフィルター -->
+      <filter id="gsWaveFilter" x="0%" y="0%" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.04 0.09" numOctaves="4" result="noise"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="12" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+
+      <!-- 深海グラデーション -->
+      <radialGradient id="gsOceanGrad" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#0284c7"/>
+        <stop offset="35%" stop-color="#0369a1"/>
+        <stop offset="70%" stop-color="#075985"/>
+        <stop offset="95%" stop-color="#082f49"/>
+        <stop offset="100%" stop-color="#020617"/>
+      </radialGradient>
+
+      <!-- GS ダイバー 立体台形インデックス（縦用） -->
+      <g id="gsBlockIndexV">
+        <polygon points="-5,-12 5,-12 6,12 -6,12" fill="#334155" stroke="#94a3b8" stroke-width="0.8"/>
+        <polygon points="-3,-10 3,-10 4,10 -4,10" fill="#f8fafc"/>
+        <line x1="0" y1="-8" x2="0" y2="8" stroke="#cbd5e1" stroke-width="0.8"/>
+      </g>
+
+      <!-- GS ダイバー 立体台形インデックス（横用） -->
+      <g id="gsBlockIndexH">
+        <polygon points="-12,-5 12,-5 12,5 -12,5" fill="#334155" stroke="#94a3b8" stroke-width="0.8"/>
+        <polygon points="-10,-3 10,-3 10,3 -10,3" fill="#f8fafc"/>
+        <line x1="-8" y1="0" x2="8" y2="0" stroke="#cbd5e1" stroke-width="0.8"/>
+      </g>
+
+      <!-- デイトナ「パンダ」サブダイヤル -->
       <g id="daytonaPandaSub3">
         <circle cx="0" cy="0" r="33.5" fill="#0d0e12" stroke="#475569" stroke-width="0.8"/>
         <circle cx="0" cy="0" r="28" fill="#ffffff"/>
-        <!-- 内周スネイル同心円 -->
         <circle cx="0" cy="0" r="23" fill="none" stroke="#e2e8f0" stroke-width="0.7"/>
         <circle cx="0" cy="0" r="18" fill="none" stroke="#e2e8f0" stroke-width="0.7"/>
         <circle cx="0" cy="0" r="13" fill="none" stroke="#e2e8f0" stroke-width="0.7"/>
-        <!-- 外周黒リング上のシルバー目盛り -->
         <line x1="0" y1="-33" x2="0" y2="-28" stroke="#ffffff" stroke-width="1.3"/>
         <line x1="28" y1="-16" x2="24" y2="-13.5" stroke="#ffffff" stroke-width="1.1"/>
         <line x1="28" y1="16" x2="24" y2="13.5" stroke="#ffffff" stroke-width="1.1"/>
@@ -136,8 +162,6 @@
         <line x1="0" y1="3" x2="0" y2="-21" stroke="#334155" stroke-width="1.2"/>
         <circle cx="0" cy="0" r="2" fill="#64748b"/>
       </g>
-
-      <!-- 6時位置: 60秒スモールセコンド -->
       <g id="daytonaPandaSub6">
         <circle cx="0" cy="0" r="33.5" fill="#0d0e12" stroke="#475569" stroke-width="0.8"/>
         <circle cx="0" cy="0" r="28" fill="#ffffff"/>
@@ -156,8 +180,6 @@
         <line x1="0" y1="3" x2="0" y2="-21" stroke="#334155" stroke-width="1.2"/>
         <circle cx="0" cy="0" r="2" fill="#64748b"/>
       </g>
-
-      <!-- 9時位置: 12時間積算計 -->
       <g id="daytonaPandaSub9">
         <circle cx="0" cy="0" r="33.5" fill="#0d0e12" stroke="#475569" stroke-width="0.8"/>
         <circle cx="0" cy="0" r="28" fill="#ffffff"/>
@@ -176,14 +198,11 @@
         <circle cx="0" cy="0" r="2" fill="#64748b"/>
       </g>
 
-      <!-- デイトナ・ホワイトゴールド立体インデックス（パンダ仕様・夜光＆黒ライン） -->
       <g id="daytonaPandaIndex">
         <rect x="-3" y="-12" width="6" height="24" rx="2" fill="#334155" stroke="#94a3b8" stroke-width="0.6"/>
         <rect x="-1.8" y="-10" width="3.6" height="20" rx="1.2" fill="#ffffff"/>
         <line x1="0" y1="-8" x2="0" y2="8" stroke="#0f172a" stroke-width="0.8"/>
       </g>
-
-      <!-- ROLEX 立体王冠マーク（ホワイトゴールド調シルバー） -->
       <g id="rolexSilverCoronet">
         <path d="M-11,0 L-14,-18 L-5,-9 L0,-23 L5,-9 L14,-18 L11,0 Z" fill="#334155" stroke="#94a3b8" stroke-width="0.8"/>
         <circle cx="-14" cy="-19" r="1.8" fill="#475569"/>
@@ -268,7 +287,8 @@
     <div class="control-row">
       <label for="themeSelector">デザイン選択:</label>
       <select id="themeSelector" onchange="changeTheme(this.value)">
-        <option value="rolex_panda" selected>★ ロレックス（デイトナ・白文字盤 パンダ完全再現）</option>
+        <option value="gs_diver" selected>★ グランドセイコー（Ushio 潮 スプリングドライブ 300mダイバー）</option>
+        <option value="rolex_panda">★ ロレックス（デイトナ・白文字盤 パンダ完全再現）</option>
         <option value="omega">★ オメガ（スピードマスター ムーンウォッチ・完全再現）</option>
         <option value="plain">0. スタンダード（シンプル・無地白）</option>
         <option value="casio_mq">1. チープカシオ（CASIO スタンダード MQ-24）</option>
@@ -282,7 +302,6 @@
         <option value="cartier">9. カルティエ（サントス ローマン＆青焼き針）</option>
         <option value="iwc">10. IWC（ポルトギーゼ クロノグラフ）</option>
         <option value="breitling">11. ブライトリング（ナビタイマー 航空計算尺）</option>
-        <option value="gs">12. グランドセイコー（白樺 / 雪白 ドーフィン針）</option>
       </select>
     </div>
 
@@ -386,65 +405,125 @@
     var secHTML = "";
     var capHTML = "";
 
-    if (key === "rolex_panda") {
-      // ★ ロレックス デイトナ・白文字盤「パンダ」（実機画像完全再現）
+    if (key === "gs_diver") {
+      // ★ グランドセイコー Ushio（潮）スプリングドライブ 300mダイバー（完全再現）
       dialHTML = `
-        <!-- 黒セラクロムベゼル外殻 -->
-        <circle cx="180" cy="180" r="176" fill="#09090b" stroke="#334155" stroke-width="2.5"/>
+        <!-- チタン外殻ケース＆深いネイビーのセラミック回転ベゼル -->
+        <circle cx="180" cy="180" r="176" fill="#0f172a" stroke="#475569" stroke-width="3"/>
+        <circle cx="180" cy="180" r="174" fill="#082f49" stroke="#0284c7" stroke-width="1.5"/>
+        <circle cx="180" cy="180" r="144" fill="#041a2f" stroke="#334155" stroke-width="2"/>
+
+        <!-- ベゼル刻印（10, 20, 30, 40, 50 & ミニッツドット） -->
+        <polygon points="180,10 172,25 188,25" fill="#f8fafc"/>
+        <circle cx="180" cy="19" r="3.2" fill="#38bdf8"/>
         
-        <!-- ベゼル・プラチナ調タキメーター刻印 & 正三角形インジケーター -->
+        <circle cx="218" cy="15" r="1.5" fill="#f8fafc"/><circle cx="236" cy="21" r="1.5" fill="#f8fafc"/>
+        <circle cx="253" cy="28" r="1.5" fill="#f8fafc"/><circle cx="269" cy="38" r="1.5" fill="#f8fafc"/>
+        <text x="296" y="66" text-anchor="middle" font-size="14" font-family="'Helvetica Neue', sans-serif" font-weight="900" fill="#f8fafc">10</text>
+        <circle cx="317" cy="94" r="1.5" fill="#f8fafc"/><circle cx="327" cy="113" r="1.5" fill="#f8fafc"/>
+        <circle cx="334" cy="133" r="1.5" fill="#f8fafc"/><circle cx="338" cy="154" r="1.5" fill="#f8fafc"/>
+        <text x="338" y="196" text-anchor="middle" font-size="14" font-family="'Helvetica Neue', sans-serif" font-weight="900" fill="#f8fafc">20</text>
+        <text x="296" y="316" text-anchor="middle" font-size="14" font-family="'Helvetica Neue', sans-serif" font-weight="900" fill="#f8fafc">30</text>
+        <text x="64" y="316" text-anchor="middle" font-size="14" font-family="'Helvetica Neue', sans-serif" font-weight="900" fill="#f8fafc">40</text>
+        <text x="22" y="196" text-anchor="middle" font-size="14" font-family="'Helvetica Neue', sans-serif" font-weight="900" fill="#f8fafc">50</text>
+
+        <!-- 有機的な潮・黒潮ダイナミックウェーブテクスチャ層 -->
+        <g filter="url(#gsWaveFilter)">
+          <circle cx="180" cy="180" r="142" fill="url(#gsOceanGrad)"/>
+          <!-- 波頭のハイライトライン群 -->
+          <path d="M 60,110 Q 110,95 180,120 T 300,105" fill="none" stroke="#38bdf8" stroke-width="2.5" opacity="0.6"/>
+          <path d="M 50,150 Q 130,130 190,165 T 310,140" fill="none" stroke="#0ea5e9" stroke-width="3" opacity="0.5"/>
+          <path d="M 45,190 Q 100,210 170,185 T 315,200" fill="none" stroke="#7dd3fc" stroke-width="2.2" opacity="0.55"/>
+          <path d="M 60,230 Q 140,215 210,240 T 300,225" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.6"/>
+          <path d="M 75,270 Q 130,250 190,275 T 285,260" fill="none" stroke="#0284c7" stroke-width="2.8" opacity="0.5"/>
+        </g>
+        <circle cx="180" cy="180" r="142" fill="url(#gsOceanGrad)" opacity="0.35"/>
+
+        <!-- 外周目盛りリング -->
+        <circle cx="180" cy="180" r="140" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-dasharray="0.8, 2.87" opacity="0.8"/>
+
+        <!-- 8時〜9時位置: 扇型パワーリザーブ表示 -->
+        <path d="M 125,202 A 38 38 0 0 1 106,236" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="125" y1="202" x2="119" y2="204" stroke="#ffffff" stroke-width="1.2"/>
+        <line x1="106" y1="236" x2="101" y2="233" stroke="#ffffff" stroke-width="1.2"/>
+        <!-- パワーリザーブ小針 -->
+        <line x1="138" y1="228" x2="114" y2="216" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="138" cy="228" r="2.5" fill="#334155"/>
+
+        <!-- ロゴ & レタリング -->
+        <text x="180" y="94" text-anchor="middle" font-family="'Times New Roman', serif" font-size="22" font-weight="bold" fill="#ffffff">GS</text>
+        <text x="180" y="108" text-anchor="middle" font-family="'Times New Roman', serif" font-size="11" font-weight="bold" fill="#ffffff" letter-spacing="1">Grand Seiko</text>
+        <text x="180" y="222" text-anchor="middle" font-family="'Helvetica Neue', sans-serif" font-size="6.5" font-weight="bold" fill="#38bdf8" letter-spacing="0.8">SPRING DRIVE</text>
+        <text x="180" y="231" text-anchor="middle" font-family="'Helvetica Neue', sans-serif" font-size="6.5" font-weight="bold" fill="#ffffff" letter-spacing="0.8">U.F.A.</text>
+        <text x="180" y="240" text-anchor="middle" font-family="'Helvetica Neue', sans-serif" font-size="6" font-weight="bold" fill="#94a3b8" letter-spacing="0.5">DIVER'S 300m</text>
+
+        <!-- 12時ダブルインデックス -->
+        <use href="#gsBlockIndexV" x="174" y="52"/>
+        <use href="#gsBlockIndexV" x="186" y="52"/>
+        <!-- 3・6・9時インデックス -->
+        <use href="#gsBlockIndexH" x="306" y="180"/>
+        <use href="#gsBlockIndexV" x="180" y="308"/>
+        <use href="#gsBlockIndexH" x="54" y="180"/>
+        <!-- 傾斜ブロックインデックス（1, 2, 4, 5, 7, 8, 10, 11時） -->
+        <use href="#gsBlockIndexV" x="244" y="69" transform="rotate(30 244 69)"/>
+        <use href="#gsBlockIndexV" x="291" y="116" transform="rotate(60 291 116)"/>
+        <use href="#gsBlockIndexV" x="291" y="244" transform="rotate(120 291 244)"/>
+        <use href="#gsBlockIndexV" x="244" y="291" transform="rotate(150 244 291)"/>
+        <use href="#gsBlockIndexV" x="116" y="291" transform="rotate(210 116 291)"/>
+        <use href="#gsBlockIndexV" x="69" y="244" transform="rotate(240 69 244)"/>
+        <use href="#gsBlockIndexV" x="69" y="116" transform="rotate(300 69 116)"/>
+        <use href="#gsBlockIndexV" x="116" y="69" transform="rotate(330 116 69)"/>
+      `;
+      // GSダイバー専用・巨大アロー時針＆極太ペンシル分針＆蓄光ドット秒針
+      hourHTML = `
+        <!-- 太身アロー時針 -->
+        <polygon points="180,95 192,120 184,120 184,180 176,180 176,120 168,120" fill="#334155" stroke="#94a3b8" stroke-width="1.2"/>
+        <polygon points="180,101 187,117 182,117 182,176 178,176 178,117 173,117" fill="#f8fafc"/>
+      `;
+      minHTML  = `
+        <!-- 長大ペンシル分針 -->
+        <polygon points="180,50 186,65 184,180 176,180 174,65" fill="#334155" stroke="#94a3b8" stroke-width="1.2"/>
+        <polygon points="180,55 183,67 182,176 178,176 177,67" fill="#f8fafc"/>
+      `;
+      secHTML  = `
+        <!-- 秒針（ブルー＆蓄光丸ドットカウンター） -->
+        <line x1="180" y1="210" x2="180" y2="42" stroke="#38bdf8" stroke-width="1.6"/>
+        <circle cx="180" cy="72" r="4.5" fill="#334155" stroke="#38bdf8" stroke-width="1.2"/>
+        <circle cx="180" cy="72" r="3.2" fill="#ffffff"/>
+      `;
+      capHTML  = `<circle cx="180" cy="180" r="5" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>`;
+
+    } else if (key === "rolex_panda") {
+      dialHTML = `
+        <circle cx="180" cy="180" r="176" fill="#09090b" stroke="#334155" stroke-width="2.5"/>
         <text x="180" y="23" text-anchor="middle" font-size="8.5" font-family="'Helvetica Neue', Arial, sans-serif" font-weight="900" fill="#f8fafc" letter-spacing="1">UNITS PER HOUR</text>
-        <polygon points="216,18 214,14 218,14" fill="#f8fafc"/>
-        <text x="234" y="27" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">400</text>
-        <polygon points="252,28 250,24 254,24" fill="#f8fafc"/>
-        <text x="272" y="42" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">300</text>
-        <polygon points="288,47 285,44 289,43" fill="#f8fafc"/>
-        <text x="306" y="68" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">240</text>
-        <polygon points="320,78 316,76 319,74" fill="#f8fafc"/>
-        <text x="332" y="105" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">200</text>
-        <polygon points="340,120 336,120 338,117" fill="#f8fafc"/>
-        <text x="345" y="145" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">160</text>
-        <polygon points="346,160 342,161 343,158" fill="#f8fafc"/>
-        <text x="346" y="183" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">120</text>
-        <polygon points="341,208 338,206 341,204" fill="#f8fafc"/>
-        <text x="330" y="235" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">100</text>
-        <polygon points="314,264 311,261 315,260" fill="#f8fafc"/>
-        <text x="290" y="295" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">90</text>
-        <polygon points="268,318 266,314 270,314" fill="#f8fafc"/>
-        <text x="240" y="338" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">80</text>
-        <polygon points="210,347 209,343 213,344" fill="#f8fafc"/>
-        <text x="180" y="350" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">70</text>
-        <polygon points="150,347 147,344 151,343" fill="#f8fafc"/>
-        <text x="120" y="338" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">65</text>
-        <polygon points="68,295 65,296 67,292" fill="#f8fafc"/>
-        <text x="22" y="183" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">60</text>
-
-        <!-- ピュアホワイト・グロスダイヤル盤面 -->
+        <polygon points="216,18 214,14 218,14" fill="#f8fafc"/><text x="234" y="27" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">400</text>
+        <polygon points="252,28 250,24 254,24" fill="#f8fafc"/><text x="272" y="42" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">300</text>
+        <polygon points="288,47 285,44 289,43" fill="#f8fafc"/><text x="306" y="68" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">240</text>
+        <polygon points="320,78 316,76 319,74" fill="#f8fafc"/><text x="332" y="105" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">200</text>
+        <polygon points="340,120 336,120 338,117" fill="#f8fafc"/><text x="345" y="145" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">160</text>
+        <polygon points="346,160 342,161 343,158" fill="#f8fafc"/><text x="346" y="183" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">120</text>
+        <polygon points="341,208 338,206 341,204" fill="#f8fafc"/><text x="330" y="235" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">100</text>
+        <polygon points="314,264 311,261 315,260" fill="#f8fafc"/><text x="290" y="295" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">90</text>
+        <polygon points="268,318 266,314 270,314" fill="#f8fafc"/><text x="240" y="338" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">80</text>
+        <polygon points="210,347 209,343 213,344" fill="#f8fafc"/><text x="180" y="350" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">70</text>
+        <polygon points="150,347 147,344 151,343" fill="#f8fafc"/><text x="120" y="338" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">65</text>
+        <polygon points="68,295 65,296 67,292" fill="#f8fafc"/><text x="22" y="183" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#f8fafc">60</text>
         <circle cx="180" cy="180" r="148" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
-
-        <!-- 外周 1/8秒高精度ミニッツトラック（ブラック細密目盛り） -->
         <circle cx="180" cy="180" r="144" fill="none" stroke="#0f172a" stroke-width="5" stroke-dasharray="0.8, 2.4" opacity="0.85"/>
-
-        <!-- 3連サブダイヤル（黒外周リング＋白スネイル内周の正規パンダ配置） -->
         <use href="#daytonaPandaSub3" x="246" y="180"/>
         <use href="#daytonaPandaSub6" x="180" y="238"/>
         <use href="#daytonaPandaSub9" x="114" y="180"/>
-
-        <!-- ROLEX シルバークラウン & 正統5行レタリング -->
         <use href="#rolexSilverCoronet" x="180" y="78"/>
         <text x="180" y="96" text-anchor="middle" font-family="'Times New Roman', serif" font-size="16" font-weight="bold" fill="#0f172a" letter-spacing="1">ROLEX</text>
         <text x="180" y="106" text-anchor="middle" font-family="'Helvetica Neue', sans-serif" font-size="6.5" font-weight="bold" fill="#0f172a" letter-spacing="0.8">OYSTER PERPETUAL</text>
         <text x="180" y="114" text-anchor="middle" font-family="'Helvetica Neue', sans-serif" font-size="5.2" font-weight="bold" fill="#475569" letter-spacing="0.6">SUPERLATIVE CHRONOMETER</text>
         <text x="180" y="121" text-anchor="middle" font-family="'Helvetica Neue', sans-serif" font-size="5.2" font-weight="bold" fill="#475569" letter-spacing="0.6">OFFICIALLY CERTIFIED</text>
         <text x="180" y="128" text-anchor="middle" font-family="'Helvetica Neue', sans-serif" font-size="5.2" font-weight="bold" fill="#475569" letter-spacing="0.8">COSMOGRAPH</text>
-
-        <!-- 6時位置サブダイヤル上部・円弧状の鮮やかな赤字 DAYTONA -->
         <path id="pandaRedArc" d="M 152,216 Q 180,198 208,216" fill="none"/>
         <text font-family="'Helvetica Neue', sans-serif" font-size="9" font-weight="900" fill="#dc2626" letter-spacing="1">
           <textPath href="#pandaRedArc" startOffset="50%" text-anchor="middle">DAYTONA</textPath>
         </text>
-
-        <!-- ホワイトゴールド立体アプライトインデックス（8箇所） -->
         <use href="#daytonaPandaIndex" x="235" y="85" transform="rotate(30 235 85)"/>
         <use href="#daytonaPandaIndex" x="275" y="125" transform="rotate(60 275 125)"/>
         <use href="#daytonaPandaIndex" x="275" y="235" transform="rotate(120 275 235)"/>
@@ -454,7 +533,6 @@
         <use href="#daytonaPandaIndex" x="85" y="125" transform="rotate(300 85 125)"/>
         <use href="#daytonaPandaIndex" x="125" y="85" transform="rotate(330 125 85)"/>
       `;
-      // 実機パンダ仕様ホワイトゴールド・ブラックラインバトン針 & 先端アロー秒針
       hourHTML = `
         <rect x="176.5" y="98" width="7" height="84" rx="2" fill="#334155" stroke="#94a3b8" stroke-width="0.8"/>
         <rect x="178" y="104" width="4" height="62" rx="1" fill="#ffffff"/>
@@ -466,7 +544,6 @@
         <line x1="180" y1="64" x2="180" y2="158" stroke="#0f172a" stroke-width="0.9"/>
       `;
       secHTML  = `
-        <!-- パンダ黒秒針（末端カウンターウェイト＆前部アローサークル） -->
         <line x1="180" y1="210" x2="180" y2="40" stroke="#0f172a" stroke-width="1.6" stroke-linecap="round"/>
         <circle cx="180" cy="200" r="2.8" fill="#0f172a"/>
         <circle cx="180" cy="72" r="3.6" fill="#0f172a"/>
@@ -726,7 +803,8 @@
       secHTML  = `<line x1="180" y1="210" x2="180" y2="40" stroke="#1d4ed8" stroke-width="1"/>`;
       capHTML  = `<circle cx="180" cy="180" r="3.5" fill="#1e3a8a"/>`;
 
-    } else if (key === "breitling") {
+    } else {
+      // 11. ブライトリング
       dialHTML = `
         <circle cx="180" cy="180" r="176" fill="#0b0c10" stroke="#94a3b8" stroke-width="4"/>
         <circle cx="180" cy="180" r="162" fill="none" stroke="#f8fafc" stroke-width="12" stroke-dasharray="2,3"/>
@@ -743,25 +821,6 @@
       minHTML  = `<rect x="177" y="56" width="6" height="128" fill="#f8fafc"/><rect x="178.5" y="64" width="3" height="96" fill="#ef4444"/>`;
       secHTML  = `<line x1="180" y1="210" x2="180" y2="40" stroke="#ef4444" stroke-width="1.4"/><polygon points="180,40 176,50 184,50" fill="#ef4444"/>`;
       capHTML  = `<circle cx="180" cy="180" r="4.5" fill="#f8fafc"/>`;
-
-    } else {
-      dialHTML = `
-        <circle cx="180" cy="180" r="176" fill="#f1f5f9" stroke="#94a3b8" stroke-width="3"/>
-        <circle cx="180" cy="180" r="168" fill="#ffffff"/>
-        <rect x="176" y="24" width="8" height="24" fill="#334155" stroke="#94a3b8" stroke-width="0.8"/>
-        <rect x="288" y="176" width="24" height="8" fill="#334155" stroke="#94a3b8" stroke-width="0.8"/>
-        <rect x="176" y="312" width="8" height="24" fill="#334155" stroke="#94a3b8" stroke-width="0.8"/>
-        <rect x="48" y="176" width="24" height="8" fill="#334155" stroke="#94a3b8" stroke-width="0.8"/>
-        <g fill="#0f172a" font-family="'Times New Roman', serif" font-weight="bold" text-anchor="middle">
-          <text x="180" y="112" font-size="22">GS</text>
-          <text x="180" y="126" font-size="12" letter-spacing="1">Grand Seiko</text>
-          <text x="180" y="235" font-size="7.5" fill="#475569" letter-spacing="1.5">HI-BEAT 36000</text>
-        </g>
-      `;
-      hourHTML = `<polygon points="180,88 186,145 180,180 174,145" fill="#334155" stroke="#64748b" stroke-width="0.8"/>`;
-      minHTML  = `<polygon points="180,48 185,145 180,180 175,145" fill="#334155" stroke="#64748b" stroke-width="0.8"/>`;
-      secHTML  = `<line x1="180" y1="210" x2="180" y2="35" stroke="#1d4ed8" stroke-width="1.2"/>`;
-      capHTML  = `<circle cx="180" cy="180" r="4.5" fill="#334155"/>`;
     }
 
     dialGroup.innerHTML = dialHTML;
@@ -798,14 +857,14 @@
     requestAnimationFrame(update);
   }
 
-  // 初期表示を新パンダデイトナに設定
-  changeTheme("rolex_panda");
+  // 初期表示を新グランドセイコー Ushio ダイバーに設定
+  changeTheme("gs_diver");
   requestAnimationFrame(update);
 
   // 【自己更新機能付き Service Worker】
   if ("serviceWorker" in navigator) {
     var swCode = `
-      var CACHE_NAME = 'real-clock-v6-panda';
+      var CACHE_NAME = 'real-clock-v7-gs-ushio';
       self.addEventListener('install', function(e) {
         self.skipWaiting();
       });
