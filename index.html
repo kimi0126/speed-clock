@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>究極再現・可変倍速リアルクロック</title>
+  
+  <!-- iOS向けPWA全画面設定 -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="リアルクロック">
+
+  <!-- インラインWeb App Manifest（Data URI形式） -->
+  <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIueptumjqOWGjeePv+ODquOCouODq+OCr+ODreODg+OCryIsCiAgInNob3J0X25hbWUiOiAi44Kv44Ot44OD44KvIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwODA5MGIiLAogICJ0aGVtZV9jb2xvciIjogIiMwODA5MGIiCn0=">
+
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 95vh;
+      background-color: #08090b;
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: radial-gradient(circle at center, #1b1d24 0%, #0d0e12 100%);
+      padding: 16px;
+      border-radius: 24px;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.9), inset 0 1px 1px rgba(255,255,255,0.1);
+      width: 100%;
+      max-width: 480px;
+    }
+    .clock-svg {
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      filter: drop-shadow(0 12px 24px rgba(0,0,0,0.8));
+      display: block;
+    }
+    .controls {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    label { font-size: 13px; font-weight: bold; color: #94a3b8; }
+    select {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: #111216;
+      color: #f8fafc;
+      font-size: 13px;
+      font-weight: 600;
+      outline: none;
+      max-width: 100%;
+    }
+    input[type="range"] { width: 140px; cursor: pointer; }
+    input[type="number"] {
+      width: 65px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      background: #111216;
+      color: #fff;
+      font-size: 14px;
+      text-align: right;
+    }
+    .time-input { width: 46px !important; text-align: center !important; }
+    .digital-readout {
+      margin: 6px 0;
+      font-size: 24px;
+      font-family: monospace;
+      color: #94a3b8;
+      letter-spacing: 2px;
+    }
+    .button-group {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    button {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      background: #2563eb;
+      color: #fff;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:active { transform: scale(0.96); }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <svg class="clock-svg" viewBox="0 0 360 360" id="clockSVG">
+    <defs>
+      <g id="daytonaSubDial">
+        <circle cx="0" cy="0" r="32" fill="#0d0e12" stroke="#e2e8f0" stroke-width="2.5"/>
+        <circle cx="0" cy="0" r="26" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.8"/>
+        <line x1="0" y1="-30" x2="0" y2="-24" stroke="#e2e8f0" stroke-width="1.2"/>
+        <line x1="0" y1="30" x2="0" y2="24" stroke="#e2e8f0" stroke-width="1.2"/>
+        <line x1="-30" y1="0" x2="-24" y2="0" stroke="#e2e8f0" stroke-width="1.2"/>
+        <line x1="30" y1="0" x2="24" y2="0" stroke="#e2e8f0" stroke-width="1.2"/>
+        <line x1="0" y1="2" x2="0" y2="-20" stroke="#ffffff" stroke-width="1.5"/>
+      </g>
+
+      <g id="rolexCoronet">
+        <path d="M-10,0 L-13,-18 L-5,-9 L0,-22 L5,-9 L13,-18 L10,0 Z" fill="#eab308" stroke="#ca8a04" stroke-width="0.8"/>
+        <circle cx="-13" cy="-19" r="1.8" fill="#eab308"/>
+        <circle cx="-5" cy="-10" r="1.5" fill="#eab308"/>
+        <circle cx="0" cy="-23" r="2" fill="#eab308"/>
+        <circle cx="5" cy="-10" r="1.5" fill="#eab308"/>
+        <circle cx="13" cy="-19" r="1.8" fill="#eab308"/>
+        <ellipse cx="0" cy="1" rx="9" ry="2.5" fill="#eab308" stroke="#ca8a04" stroke-width="0.8"/>
+      </g>
+    </defs>
+
+    <g id="dialGroup">
+      <circle cx="180" cy="180" r="176" fill="#0a0a0c" stroke="#334155" stroke-width="3"/>
+      <circle cx="180" cy="180" r="148" fill="#0d0e12" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+      
+      <text x="180" y="24" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#e2e8f0" letter-spacing="1">UNITS PER HOUR 400</text>
+      <text x="342" y="183" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#e2e8f0">120</text>
+      <text x="180" y="348" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#e2e8f0">80</text>
+      <text x="18" y="183" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#e2e8f0">60</text>
+
+      <use href="#daytonaSubDial" x="240" y="180"/>
+      <use href="#daytonaSubDial" x="120" y="180"/>
+      <use href="#daytonaSubDial" x="180" y="236"/>
+
+      <use href="#rolexCoronet" x="180" y="86"/>
+      <text x="180" y="104" text-anchor="middle" font-family="'Times New Roman', serif" font-size="16" font-weight="bold" fill="#ffffff">ROLEX</text>
+      <text x="180" y="115" text-anchor="middle" font-size="6.5" font-weight="bold" fill="#cbd5e1" letter-spacing="1">OYSTER PERPETUAL</text>
+      <text x="180" y="124" text-anchor="middle" font-size="5.5" font-weight="bold" fill="#94a3b8">SUPERLATIVE CHRONOMETER</text>
+      <text x="180" y="196" text-anchor="middle" font-size="8" font-weight="bold" fill="#ef4444" letter-spacing="0.5">DAYTONA</text>
+
+      <rect x="226" y="58" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(30 228 65)"/>
+      <rect x="268" y="100" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(60 270 107)"/>
+      <rect x="268" y="246" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(120 270 253)"/>
+      <rect x="226" y="288" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(150 228 295)"/>
+      <rect x="129" y="288" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(210 131 295)"/>
+      <rect x="87" y="246" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(240 89 253)"/>
+      <rect x="87" y="100" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(300 89 107)"/>
+      <rect x="129" y="58" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(330 131 65)"/>
+    </g>
+
+    <g id="hourGroup" transform="rotate(305 180 180)">
+      <rect x="176.5" y="100" width="7" height="84" rx="2" fill="#e2e8f0"/>
+      <rect x="178.5" y="106" width="3" height="60" rx="1" fill="#93c5fd"/>
+    </g>
+    <g id="minGroup" transform="rotate(60 180 180)">
+      <rect x="177.5" y="60" width="5" height="124" rx="1.5" fill="#e2e8f0"/>
+      <rect x="179" y="66" width="2" height="96" rx="1" fill="#93c5fd"/>
+    </g>
+    <g id="secGroup" transform="rotate(180 180 180)">
+      <line x1="180" y1="210" x2="180" y2="40" stroke="#ef4444" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="180" cy="75" r="3.5" fill="#ef4444"/>
+    </g>
+    <circle cx="180" cy="180" r="5" fill="#e2e8f0" stroke="#334155" stroke-width="1.5"/>
+  </svg>
+  
+  <div class="digital-readout" id="digitalTime">10:10:30</div>
+
+  <div class="controls">
+    <div class="control-row">
+      <label for="themeSelector">超精巧デザイン:</label>
+      <select id="themeSelector" onchange="changeTheme(this.value)">
+        <option value="rolex" selected>1. ROLEX デイトナ（黒セラクロム＆3連メーター）</option>
+        <option value="franck">2. FRANCK MULLER カサブランカ（極大ビザン数字＆トノー）</option>
+        <option value="omega">3. OMEGA スピードマスター（Ω＆プロフェッショナル）</option>
+        <option value="gshock">4. G-SHOCK（八角オクタゴン＆四隅ビス）</option>
+        <option value="plain">5. スタンダード（初期・無地シンプル白）</option>
+      </select>
+    </div>
+
+    <div class="control-row">
+      <label>時刻指定:</label>
+      <input type="number" id="targetHour" class="time-input" min="0" max="23" value="10">
+      <span>:</span>
+      <input type="number" id="targetMin" class="time-input" min="0" max="59" value="10">
+      <span>:</span>
+      <input type="number" id="targetSec" class="time-input" min="0" max="59" value="30">
+      <button onclick="applyTargetTime()">設定</button>
+      <button id="pauseBtn" onclick="togglePause()">一時停止</button>
+    </div>
+
+    <div class="control-row">
+      <label for="speedRange">倍速:</label>
+      <input type="range" id="speedRange" min="0" max="60" step="0.5" value="1">
+      <input type="number" id="speedInput" min="0" max="3600" step="0.5" value="1">
+      <span>倍</span>
+    </div>
+
+    <div class="button-group">
+      <button onclick="setSpeed(1)">等倍</button>
+      <button onclick="setSpeed(2)">2倍</button>
+      <button onclick="setSpeed(10)">10倍</button>
+      <button onclick="setSpeed(60)">60倍</button>
+      <button onclick="resetToRealTime()">実時刻同期</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var dialGroup = document.getElementById("dialGroup");
+  var hourGroup = document.getElementById("hourGroup");
+  var minGroup = document.getElementById("minGroup");
+  var secGroup = document.getElementById("secGroup");
+  var digitalTimeEl = document.getElementById("digitalTime");
+
+  var speedRange = document.getElementById("speedRange");
+  var speedInput = document.getElementById("speedInput");
+  var pauseBtn = document.getElementById("pauseBtn");
+  var targetHour = document.getElementById("targetHour");
+  var targetMin = document.getElementById("targetMin");
+  var targetSec = document.getElementById("targetSec");
+
+  var speed = 1.0;
+  var virtualTime = Date.now();
+  var lastRealTime = Date.now();
+  var isPaused = false;
+
+  var now = new Date();
+  targetHour.value = ("0" + now.getHours()).slice(-2);
+  targetMin.value = ("0" + now.getMinutes()).slice(-2);
+  targetSec.value = ("0" + now.getSeconds()).slice(-2);
+
+  speedRange.addEventListener("input", function(e) {
+    speed = parseFloat(e.target.value);
+    speedInput.value = speed;
+  });
+  speedInput.addEventListener("input", function(e) {
+    speed = Math.max(0, parseFloat(e.target.value) || 0);
+    speedRange.value = speed;
+  });
+
+  window.setSpeed = function(v) {
+    speed = v;
+    speedRange.value = v;
+    speedInput.value = v;
+  };
+  window.resetToRealTime = function() {
+    virtualTime = Date.now();
+    lastRealTime = Date.now();
+  };
+  window.applyTargetTime = function() {
+    var h = parseInt(targetHour.value, 10) || 0;
+    var m = parseInt(targetMin.value, 10) || 0;
+    var s = parseInt(targetSec.value, 10) || 0;
+    var d = new Date(virtualTime);
+    d.setHours(h, m, s, 0);
+    virtualTime = d.getTime();
+    lastRealTime = Date.now();
+  };
+  window.togglePause = function() {
+    isPaused = !isPaused;
+    if (isPaused) {
+      pauseBtn.textContent = "再開";
+      pauseBtn.style.background = "#ef4444";
+    } else {
+      pauseBtn.textContent = "一時停止";
+      pauseBtn.style.background = "#2563eb";
+      lastRealTime = Date.now();
+    }
+  };
+
+  window.changeTheme = function(key) {
+    if (key === "rolex") {
+      dialGroup.innerHTML = `
+        <circle cx="180" cy="180" r="176" fill="#0a0a0c" stroke="#334155" stroke-width="3"/>
+        <circle cx="180" cy="180" r="148" fill="#0d0e12" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+        <text x="180" y="24" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#e2e8f0" letter-spacing="1">UNITS PER HOUR 400</text>
+        <text x="342" y="183" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#e2e8f0">120</text>
+        <text x="180" y="348" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#e2e8f0">80</text>
+        <text x="18" y="183" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#e2e8f0">60</text>
+        <use href="#daytonaSubDial" x="240" y="180"/>
+        <use href="#daytonaSubDial" x="120" y="180"/>
+        <use href="#daytonaSubDial" x="180" y="236"/>
+        <use href="#rolexCoronet" x="180" y="86"/>
+        <text x="180" y="104" text-anchor="middle" font-family="'Times New Roman', serif" font-size="16" font-weight="bold" fill="#ffffff">ROLEX</text>
+        <text x="180" y="115" text-anchor="middle" font-size="6.5" font-weight="bold" fill="#cbd5e1" letter-spacing="1">OYSTER PERPETUAL</text>
+        <text x="180" y="124" text-anchor="middle" font-size="5.5" font-weight="bold" fill="#94a3b8">SUPERLATIVE CHRONOMETER</text>
+        <text x="180" y="196" text-anchor="middle" font-size="8" font-weight="bold" fill="#ef4444" letter-spacing="0.5">DAYTONA</text>
+        <rect x="226" y="58" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(30 228 65)"/>
+        <rect x="268" y="100" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(60 270 107)"/>
+        <rect x="268" y="246" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(120 270 253)"/>
+        <rect x="226" y="288" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(150 228 295)"/>
+        <rect x="129" y="288" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(210 131 295)"/>
+        <rect x="87" y="246" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(240 89 253)"/>
+        <rect x="87" y="100" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(300 89 107)"/>
+        <rect x="129" y="58" width="5" height="14" rx="1" fill="#e2e8f0" transform="rotate(330 131 65)"/>
+      `;
+    } else if (key === "franck") {
+      dialGroup.innerHTML = `
+        <circle cx="180" cy="180" r="176" fill="#e2e8f0" stroke="#94a3b8" stroke-width="4"/>
+        <circle cx="180" cy="180" r="160" fill="#f6f3eb"/>
+        <ellipse cx="180" cy="180" rx="90" ry="115" fill="none" stroke="#475569" stroke-width="1.8"/>
+        <text x="180" y="125" text-anchor="middle" font-family="Georgia, serif" font-size="14" font-weight="bold" fill="#1e2229">FRANCK MULLER</text>
+        <text x="180" y="139" text-anchor="middle" font-family="Georgia, serif" font-size="9" font-style="italic" fill="#64748b">GENEVE</text>
+        <text x="180" y="235" text-anchor="middle" font-family="Georgia, serif" font-size="11" font-weight="bold" fill="#b91c1c">Casablanca</text>
+        <text x="180" y="60" text-anchor="middle" font-family="'Times New Roman', serif" font-size="44" font-weight="bold" fill="#1e2229" transform="scale(1, 1.4) translate(0, -16)">12</text>
+        <text x="250" y="80" text-anchor="middle" font-family="'Times New Roman', serif" font-size="38" font-weight="bold" fill="#1e2229">1</text>
+        <text x="290" y="130" text-anchor="middle" font-family="'Times New Roman', serif" font-size="40" font-weight="bold" fill="#1e2229">2</text>
+        <text x="305" y="195" text-anchor="middle" font-family="'Times New Roman', serif" font-size="46" font-weight="bold" fill="#1e2229" transform="scale(1.3, 1) translate(-70, 0)">3</text>
+        <text x="290" y="255" text-anchor="middle" font-family="'Times New Roman', serif" font-size="40" font-weight="bold" fill="#1e2229">4</text>
+        <text x="250" y="305" text-anchor="middle" font-family="'Times New Roman', serif" font-size="38" font-weight="bold" fill="#1e2229">5</text>
+        <text x="180" y="245" text-anchor="middle" font-family="'Times New Roman', serif" font-size="44" font-weight="bold" fill="#1e2229" transform="scale(1, 1.4) translate(0, -10)">6</text>
+        <text x="110" y="305" text-anchor="middle" font-family="'Times New Roman', serif" font-size="38" font-weight="bold" fill="#1e2229">7</text>
+        <text x="70" y="255" text-anchor="middle" font-family="'Times New Roman', serif" font-size="40" font-weight="bold" fill="#1e2229">8</text>
+        <text x="55" y="195" text-anchor="middle" font-family="'Times New Roman', serif" font-size="46" font-weight="bold" fill="#1e2229" transform="scale(1.3, 1) translate(14, 0)">9</text>
+        <text x="70" y="130" text-anchor="middle" font-family="'Times New Roman', serif" font-size="40" font-weight="bold" fill="#1e2229">10</text>
+        <text x="110" y="80" text-anchor="middle" font-family="'Times New Roman', serif" font-size="38" font-weight="bold" fill="#1e2229">11</text>
+      `;
+    } else if (key === "omega") {
+      dialGroup.innerHTML = `
+        <circle cx="180" cy="180" r="176" fill="#121318" stroke="#383a42" stroke-width="3"/>
+        <circle cx="180" cy="180" r="150" fill="#0a0a0c"/>
+        <text x="180" y="22" text-anchor="middle" font-size="9" font-weight="bold" fill="#e2e8f0" letter-spacing="1">TACHYMETRE 500</text>
+        <use href="#daytonaSubDial" x="242" y="180"/>
+        <use href="#daytonaSubDial" x="118" y="180"/>
+        <use href="#daytonaSubDial" x="180" y="238"/>
+        <text x="180" y="95" text-anchor="middle" font-family="'Times New Roman', serif" font-size="22" font-weight="bold" fill="#ffffff">Ω</text>
+        <text x="180" y="112" text-anchor="middle" font-size="14" font-weight="bold" fill="#ffffff">OMEGA</text>
+        <text x="180" y="124" text-anchor="middle" font-family="cursive, serif" font-size="10" font-style="italic" fill="#ffffff">Speedmaster</text>
+        <text x="180" y="134" text-anchor="middle" font-family="serif" font-size="7" font-style="italic" fill="#94a3b8">PROFESSIONAL</text>
+      `;
+    } else if (key === "gshock") {
+      dialGroup.innerHTML = `
+        <polygon points="128,4 232,4 356,128 356,232 232,356 128,356 4,232 4,128" fill="#16171b" stroke="#272932" stroke-width="4"/>
+        <circle cx="50" cy="50" r="4.5" fill="#475569" stroke="#1e293b"/>
+        <circle cx="310" cy="50" r="4.5" fill="#475569" stroke="#1e293b"/>
+        <circle cx="50" cy="310" r="4.5" fill="#475569" stroke="#1e293b"/>
+        <circle cx="310" cy="310" r="4.5" fill="#475569" stroke="#1e293b"/>
+        <text x="180" y="28" text-anchor="middle" font-family="'Arial Black', sans-serif" font-size="17" font-weight="900" fill="#cbd5e1">G-SHOCK</text>
+        <text x="180" y="344" text-anchor="middle" font-family="'Arial Black', sans-serif" font-size="15" font-weight="900" fill="#cbd5e1">PROTECTION</text>
+        <circle cx="180" cy="180" r="126" fill="#0f1013" stroke="#2e323b" stroke-width="2"/>
+        <circle cx="120" cy="180" r="28" fill="#1a1c23" stroke="#334155" stroke-width="1"/>
+        <text x="180" y="132" text-anchor="middle" font-family="'Arial Black', sans-serif" font-size="13" font-weight="bold" fill="#ffffff">CASIO</text>
+        <text x="180" y="146" text-anchor="middle" font-size="8" font-weight="bold" fill="#94a3b8">WR 20BAR</text>
+      `;
+    } else {
+      dialGroup.innerHTML = `
+        <circle cx="180" cy="180" r="174" fill="#ffffff" stroke="#222222" stroke-width="6"/>
+        <text x="180" y="48" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">12</text>
+        <text x="246" y="66" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">1</text>
+        <text x="294" y="114" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">2</text>
+        <text x="312" y="188" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">3</text>
+        <text x="294" y="262" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">4</text>
+        <text x="246" y="310" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">5</text>
+        <text x="180" y="328" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">6</text>
+        <text x="114" y="310" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">7</text>
+        <text x="66" y="262" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">8</text>
+        <text x="48" y="188" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">9</text>
+        <text x="66" y="114" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">10</text>
+        <text x="114" y="66" text-anchor="middle" font-size="24" font-weight="bold" fill="#222222">11</text>
+      `;
+    }
+  };
+
+  function update() {
+    var nowTime = Date.now();
+    var delta = nowTime - lastRealTime;
+    lastRealTime = nowTime;
+
+    if (!isPaused) {
+      virtualTime += delta * speed;
+    }
+
+    var d = new Date(virtualTime);
+    var ms = d.getMilliseconds();
+    var s = d.getSeconds() + ms / 1000;
+    var m = d.getMinutes() + s / 60;
+    var h = (d.getHours() % 12) + m / 60;
+
+    hourGroup.setAttribute("transform", "rotate(" + (h * 30) + " 180 180)");
+    minGroup.setAttribute("transform", "rotate(" + (m * 6) + " 180 180)");
+    secGroup.setAttribute("transform", "rotate(" + (s * 6) + " 180 180)");
+
+    var hh = ("0" + d.getHours()).slice(-2);
+    var mm = ("0" + d.getMinutes()).slice(-2);
+    var ss = ("0" + Math.floor(s)).slice(-2);
+    digitalTimeEl.textContent = hh + ":" + mm + ":" + ss;
+
+    requestAnimationFrame(update);
+  }
+
+  requestAnimationFrame(update);
+
+  // 【PWA オフライン化】インライン Service Worker の自動登録
+  if ("serviceWorker" in navigator) {
+    var swCode = `
+      var CACHE_NAME = 'real-clock-v1';
+      self.addEventListener('install', function(e) {
+        self.skipWaiting();
+      });
+      self.addEventListener('activate', function(e) {
+        e.waitUntil(clients.claim());
+      });
+      self.addEventListener('fetch', function(e) {
+        e.respondWith(
+          fetch(e.request).then(function(res) {
+            var copy = res.clone();
+            caches.open(CACHE_NAME).then(function(cache) {
+              cache.put(e.request, copy);
+            });
+            return res;
+          }).catch(function() {
+            return caches.match(e.request);
+          })
+        );
+      });
+    `;
+    var blob = new Blob([swCode], { type: "application/javascript" });
+    navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(function(err) {
+      console.warn("PWA SW:", err);
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
